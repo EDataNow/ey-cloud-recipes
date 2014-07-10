@@ -18,16 +18,18 @@ if ['app_master', 'solo', 'util'].include?(node[:instance_role])
 
 
   node[:applications].each do |app, data|
-    template "/etc/monit.d/resque_#{app}.monitrc" do
-      owner 'root'
-      group 'root'
-      mode 0644
-      source "monitrc.conf.erb"
-      variables({
-      :num_workers => worker_count,
-      :app_name => app,
-      :rails_env => node[:environment][:framework_env]
-      })
+    if app == "edn_server"
+      template "/etc/monit.d/resque_#{app}.monitrc" do
+        owner 'root'
+        group 'root'
+        mode 0644
+        source "monitrc.conf.erb"
+        variables({
+        :num_workers => worker_count,
+        :app_name => app,
+        :rails_env => node[:environment][:framework_env]
+        })
+      end
     end
 
     worker_count.times do |count|
