@@ -67,7 +67,7 @@ include_recipe "resque"
 # include_recipe "resque-scheduler"
 
 #uncomment to run the redis recipe
-#include_recipe "redis"
+include_recipe "redis"
 
 #uncomment to run the magento_redis recipe
 #include_recipe "magento_redis"
@@ -155,7 +155,7 @@ include_recipe "resque"
   # postgresql9_xml2 "dbname"
 
   #9.2 Extensions
-  # postgresql9_pg_stat_statements "dbname"
+  postgresql9_pg_stat_statements "edn_server"
 
   # Admin-Level Contribs
   # postgresql9_pg_buffercache "postgres"
