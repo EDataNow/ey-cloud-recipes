@@ -37,8 +37,11 @@ if ['app_master', 'solo', 'util'].include?(node[:instance_role])
         owner node[:owner_name]
         group node[:owner_name]
         mode 0644
-        source "resque_#{app}.conf.erb"
-        # source "resque_wildcard.conf.erb"
+        if app == "edn_server" || app == "compass"
+          source "resque_#{app}.conf.erb"
+        else
+          source "resque_wildcard.conf.erb"
+        end
       end
     end
 
