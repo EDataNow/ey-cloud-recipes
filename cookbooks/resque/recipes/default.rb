@@ -18,7 +18,7 @@ if ['app_master', 'solo', 'util'].include?(node[:instance_role])
 
 
   node[:applications].each do |app, data|
-    if app == "edn_server"
+    if app == "edn_server" || app == "compass"
       template "/etc/monit.d/resque_#{app}.monitrc" do
         owner 'root'
         group 'root'
@@ -37,7 +37,8 @@ if ['app_master', 'solo', 'util'].include?(node[:instance_role])
         owner node[:owner_name]
         group node[:owner_name]
         mode 0644
-        source "resque_wildcard.conf.erb"
+        source "resque_#{app}.conf.erb"
+        # source "resque_wildcard.conf.erb"
       end
     end
 
