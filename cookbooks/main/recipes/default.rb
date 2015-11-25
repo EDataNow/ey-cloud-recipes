@@ -141,7 +141,7 @@ include_recipe "redis"
   # postgresql9_postgis "dbname"
 
   # PostGis 2.0 (use with versions >= 9.2)
-  #postgresql9_postgis2 "dbname"
+  postgresql9_postgis2 "edn_server"
   # postgresql9_seg "dbname"
   # postgresql9_sslinfo "dbname"
   # postgresql9_tablefunc "dbname"
