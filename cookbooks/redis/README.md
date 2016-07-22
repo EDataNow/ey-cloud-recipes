@@ -14,7 +14,7 @@ Design
 * 1+ utility instances
 * over-commit is enabled by default to ensure the least amount of problems saving your database.
 * 64-bit is required for storing over 2gigabytes worth of keys.
-* /etc/hosts mapping for `redis_instance` so that a hard config can be used to connect
+* /etc/hosts mapping for `redis-instance` so that a hard config can be used to connect
 
 Backups
 --------
@@ -24,7 +24,14 @@ This cookbook does not automate nor facilitate any backup method currently.  By 
 Specifics of Usage
 --------
 
-Simply add a utility instance named `redis` and the recipe will use that instance for redis.
+Simply add a utility instance named `redis` and the recipe will use that instance for redis. If the utility instance you wish to use redis on isn't called `redis`, update redis/attributes/default.rb with the correct instance name:
+
+```ruby
+default[:redis] = {
+  :utility_name => "my_custom_name", # default: redis
+  # ...
+}
+```
 
 Changing Defaults
 --------
@@ -38,6 +45,16 @@ Ensure you have the Dependencies installed in your local cookbooks repository ..
 Add the following to your main/recipes/default.rb
 
 ``include_recipe "redis"``
+
+Choosing a different Redis version
+--------
+This recipe installs Redis 2.8.13-r1 by default. We do not recommend earlier versions of Redis 2.8.x or 2.6.x as these versions have a known vulnerability: http://benmmurphy.github.io/blog/2015/06/04/redis-eval-lua-sandbox-escape/
+
+To install a different version of Redis:
+
+1. Change the `:version => "2.8.13-r1",` line in `attributes/default.rb` to the version you want to install
+2. Copy over the corresponding `redis-?.?.conf.erb` file to `templates/default/redis.conf.erb`
+
 
 Notes
 ------

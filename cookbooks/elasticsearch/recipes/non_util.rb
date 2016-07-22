@@ -7,7 +7,7 @@
 if ['solo','app_master'].include?(node[:instance_role])
   Chef::Log.info "Downloading Elasticsearch v#{node[:elasticsearch_version]} checksum #{node[:elasticsearch_checksum]}"
   remote_file "/tmp/elasticsearch-#{node[:elasticsearch_version]}.zip" do
-    source "http://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-#{node[:elasticsearch_version]}.zip"
+    source "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-#{node[:elasticsearch_version]}.zip"
     mode "0644"
     checksum node[:elasticsearch_checksum]
     not_if { File.exists?("/tmp/elasticsearch-#{node[:elasticsearch_version]}.zip") }
@@ -20,10 +20,22 @@ if ['solo','app_master'].include?(node[:instance_role])
 
   # Update JAVA as the Java on the AMI can sometimes crash
   #
-  Chef::Log.info "Updating Sun JDK"
-  package "dev-java/sun-jdk" do
-    version "1.6.0.26"
-    action :upgrade
+  Chef::Log.info "Updating Java JDK"
+  enable_package node[:elastic_search_java_package_name] do
+    version node[:elasticsearch_java_version]
+    unmask true
+  end
+
+  # Forcing 'install' because if lower version packages are installed
+  # then 'upgrade' installs the desired version every time it runs.
+  package node[:elastic_search_java_package_name] do
+    version node[:elasticsearch_java_version]
+    action :install
+  end
+
+  execute "Set the default Java version to #{node[:elasticsearch_java_version]}" do
+    command "eselect java-vm set system #{node[:elasticsearch_java_eselect_version]}"
+    action :run
   end
 
   directory "/usr/lib/elasticsearch-#{node[:elasticsearch_version]}" do
@@ -78,11 +90,15 @@ if ['solo','app_master'].include?(node[:instance_role])
     recursive true
   end
 
-  mount "/usr/lib/elasticsearch-#{node[:elasticsearch_version]}/data" do
-    device "#{node[:elasticsearch_home]}"
-    fstype "none"
-    options "bind,rw"
-    action :mount
+  if File.new("/proc/mounts").readlines.join.match(/\/usr\/lib[0-9]*\/elasticsearch-#{node[:elasticsearch_version]}\/data/)
+    Chef::Log.info("Elastic search bind already complete")
+  else
+    mount "/usr/lib/elasticsearch-#{node[:elasticsearch_version]}/data" do
+      device "#{node[:elasticsearch_home]}"
+      fstype "none"
+      options "bind,rw"
+      action :mount
+    end
   end
 
   template "/usr/lib/elasticsearch-#{node[:elasticsearch_version]}/config/logging.yml" do
@@ -94,6 +110,17 @@ if ['solo','app_master'].include?(node[:instance_role])
     group "elasticsearch"
     group "nogroup"
     mode 0755
+  end
+
+  max_mem = ((node[:memory][:total].to_i / 1024 * 0.75)).to_i.to_s + "m"
+  template "/usr/share/elasticsearch/elasticsearch.in.sh" do
+    source "elasticsearch.in.sh.erb"
+    mode 0644
+    backup 0
+    variables(
+      :elasticsearch_version => node[:elasticsearch_version],
+      :es_max_mem => ((node[:memory][:total].to_i / 1024 * 0.75)).to_i.to_s + "m"
+    )
   end
 
   template "/etc/monit.d/elasticsearch_#{node[:elasticsearch_clustername]}.monitrc" do

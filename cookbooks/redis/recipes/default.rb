@@ -8,6 +8,7 @@ if ['app_master'].include?(node[:instance_role])
     variables 'vm.overcommit_memory' => 1
   end
 
+
   enable_package "dev-db/redis" do
     version "2.4.6"
   end
@@ -24,7 +25,6 @@ if ['app_master'].include?(node[:instance_role])
     recursive true
     action :create
   end
-
   template "/etc/redis_util.conf" do
     owner 'root'
     group 'root'
@@ -78,14 +78,14 @@ if ['solo', 'app', 'app_master', 'util'].include?(node[:instance_role])
 
   if redis_instance
     ip_address = `ping -c 1 #{redis_instance[:private_hostname]} | awk 'NR==1{gsub(/\\(|\\)/,"",$3); print $3}'`.chomp
-    host_mapping = "#{ip_address} redis_instance"
+    host_mapping = "#{ip_address} redis-instance"
 
-    execute "Remove existing redis_instance mapping from /etc/hosts" do
-      command "sudo sed -i '/redis_instance/d' /etc/hosts"
+    execute "Remove existing redis-instance mapping from /etc/hosts" do
+      command "sudo sed -i '/redis-instance/d' /etc/hosts"
       action :run
     end
 
-    execute "Add redis_instance mapping to /etc/hosts" do
+    execute "Add redis-instance mapping to /etc/hosts" do
       command "sudo echo #{host_mapping} >> /etc/hosts"
       action :run
     end
