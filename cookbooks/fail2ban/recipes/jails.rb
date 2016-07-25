@@ -18,6 +18,7 @@ def pushFile(fileList, type)
 	files = fileList.select {|w| w[/#{type}\.d/]}
 	files.each do |filepath|
 		filename = filepath.match(/#{refPath}\/.*\/#{type}\.d\/(.*)/)
+    next if filename.nil?
 		filename = "#{type}.d/#{filename[1]}"
 		cookbook_file "/etc/fail2ban/#{filename}" do
 			source filename # filename instead of filepath in the case of a platform specific stuff
