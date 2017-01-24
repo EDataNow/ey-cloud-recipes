@@ -22,7 +22,7 @@
 # uncomment to use the block recipe. See cookbooks/block/readme.md for documentation.
 # include_recipe "ban"
 
-include_recipe "fail2ban"
+include_recipe "fail2ban" # Application
 
 # uncomment to use the sidekiq recipe. See cookbooks/sidekiq/readme.md for documentation.
 # include_recipe "sidekiq"
@@ -55,7 +55,7 @@ include_recipe "fail2ban"
 
 #uncomment to install specified packages
 # You must add your packages to packages/attributes/packages.rb
-require_recipe "packages"
+require_recipe "packages" # Application
 
 #uncomment to add specified cron jobs for application user (deploy)
 # You must add your cron jobs to cron/attributes/cron.rb
@@ -66,16 +66,16 @@ require_recipe "packages"
 #include_recipe "mongodb"
 
 #uncomment to run the resque recipe
-include_recipe "resque"
+include_recipe "resque" # Application
 
 #uncomment to run redis.yml recipe
-include_recipe "redis-yml"
+include_recipe "redis-yml" # Application, Util
 
 #uncomment to run the resque-scheduler recipe
 # include_recipe "resque-scheduler"
 
 #uncomment to run the redis recipe
-include_recipe "redis"
+include_recipe "redis" # Application, Util
 
 #uncomment to run the env-yaml recipe
 #include_recipe "env-yaml"
